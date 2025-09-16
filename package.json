@@ -1,0 +1,17 @@
+{
+  "name": "dong-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dompurify": "^3.0.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsdom": "^24.0.0"
+  }
+}

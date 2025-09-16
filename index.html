@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Đào Xuân Đông - Profile</title>
+  <link rel="icon" href="assets/favicon.png" type="image/png">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- AOS -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <!-- Typed.js -->
+  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+  <!-- Swiper (optional) -->
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <!-- Particles -->
+  <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    /* =========================
+       DESIGN TOKENS
+    ========================== */
+    :root{
+      color-scheme: light dark;
+      --bg-1:#0b0f1a; --bg-2:#0f172a; --bg-3:#0a0f1f; /* gradient base (fallback) */
+      --text:#e5e7eb; --muted:#cbd5e1;
+      --card:rgba(17,24,39,.55);
+      --stroke:rgba(255,255,255,.10);
+      --accent:#00ffa3; /* neon green */
+    }
+
+    /* =========================
+       GLOBAL BASE
+    ========================== */
+    html,body{width:100%}
+    body{
+      font-family: Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1100px 520px at 18% 8%, rgba(0,255,163,.08), transparent 60%),
+        radial-gradient(900px 500px at 82% 15%, rgba(59,130,246,.10), transparent 60%),
+        linear-gradient(180deg,var(--bg-1),var(--bg-2) 35%, var(--bg-3));
+      overflow-x:hidden; -webkit-tap-highlight-color:transparent;
+    }
+    img{max-width:100%; height:auto; display:block}
+
+    /* Noise grain (very subtle) */
+    body::before{
+      content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+      background-image:
+        radial-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+        radial-gradient(rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size:3px 3px, 5px 5px; background-position:0 0, 1px 2px;
+      mix-blend-mode:overlay; opacity:.22;
+    }
+
+    /* Particles layer */
+    #bg-net{ position:fixed; inset:0; z-index:-2; pointer-events:none; filter:saturate(.9) opacity(.9) }
+
+    /* Helpers */
+    .mono{ font-family:"Space Mono", ui-monospace, SFMono-Regular, Menlo, monospace }
+    .neon{ color:var(--accent); text-shadow:0 0 10px rgba(0,255,163,.45), 0 0 30px rgba(0,255,163,.25) }
+    .bg-dark{ background:#0d0d0d }
+    .animate-spin-slow{ animation:spin 12s linear infinite }
+    @keyframes spin{ to{ transform: rotate(360deg) } }
+
+    /* =========================
+       HEADER / NAV
+    ========================== */
+    header{ backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px) }
+    header a:hover{ color:var(--accent) }
+    @media (min-width:768px){
+      header nav a{ position:relative; padding-bottom:.25rem; transition:color .2s ease }
+      header nav a::after{
+        content:""; position:absolute; left:0; right:0; bottom:-6px; height:2px;
+        background:linear-gradient(90deg,var(--accent),transparent);
+        transform:scaleX(0); transform-origin:left; transition:transform .25s ease;
+      }
+      header nav a:hover::after{ transform:scaleX(1) }
+    }
+
+    /* =========================
+       COMPONENTS
+    ========================== */
+    .btn-neon{
+      display:inline-flex; align-items:center; gap:.55rem; padding:.95rem 1.15rem;
+      border-radius:12px; font-weight:800;
+      color:#0b1120; background:var(--accent); border:1px solid var(--accent);
+      box-shadow:0 12px 30px rgba(0,255,163,.28);
+      transition:transform .18s ease, box-shadow .18s ease, filter .18s ease;
+    }
+    .btn-neon:hover{ transform:translateY(-2px); filter:brightness(1.06); box-shadow:0 16px 40px rgba(0,255,163,.36) }
+
+    .btn-neon-ghost{
+      display:inline-flex; align-items:center; gap:.5rem; padding:.7rem 1rem; border-radius:12px;
+      color:#cfe5ff; background:transparent; border:1px solid rgba(207,229,255,.25);
+      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, color .18s ease;
+    }
+    .btn-neon-ghost:hover{ color:var(--accent); border-color:var(--accent); transform:translateY(-2px); box-shadow:0 10px 22px rgba(0,255,163,.25) }
+
+    .icon-btn{
+      display:flex; align-items:center; justify-content:center; width:46px; height:46px; border-radius:12px;
+      border:1px solid var(--stroke); color:#cbd5e1; background:transparent;
+      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, color .18s ease;
+    }
+    .icon-btn:hover{ color:var(--accent); border-color:var(--accent); transform:translateY(-2px); box-shadow:0 10px 22px rgba(0,255,163,.25) }
+
+    .card-neo{
+      background:var(--card); border:1px solid var(--stroke); border-radius:18px;
+      box-shadow:0 8px 28px rgba(0,0,0,.35); backdrop-filter:blur(10px);
+      transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    }
+    .card-neo:hover{ transform:translateY(-4px); border-color:rgba(0,255,163,.35); box-shadow:0 16px 36px rgba(0,255,163,.20) }
+
+    .section-wrap{ width:100%; max-width:72rem; margin:0 auto; padding:4rem 1rem }
+    @media (min-width:1024px){ .section-wrap{ padding:5rem 1.25rem } }
+    .section-title{ font-weight:900; letter-spacing:-.02em; font-size:2rem; margin-bottom:1.5rem; color:#fff }
+    .section-kicker{ text-transform:uppercase; letter-spacing:.18em; color:#7a8aa0; font-weight:800; font-size:.75rem }
+
+    /* Stats */
+    .stat-card{ background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:1rem; text-align:center; transition: transform .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease }
+    .stat-card:hover{ transform:translateY(-3px); border-color:rgba(0,255,163,.45); background:rgba(0,255,163,.06); box-shadow:0 14px 32px rgba(0,255,163,.18) }
+    .stat-num{ font-weight:900; font-size:2rem; line-height:1; color:#fff; letter-spacing:.02em }
+    .stat-lbl{ color:var(--muted); margin-top:.35rem; font-size:.92rem }
+
+    /* Project media */
+    .media{ position:relative; aspect-ratio:16/10; overflow:hidden; border-bottom:1px solid var(--stroke) }
+    .media img{ width:100%; height:100%; object-fit:cover; transform:scale(1.02); transition:transform .35s ease, filter .35s ease }
+    .media::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(13,13,13,0) 0%, rgba(13,13,13,.75) 100%); opacity:0; transition:opacity .35s ease }
+    .card-neo:hover .media img{ transform:scale(1.06); filter:saturate(1.05) }
+    .card-neo:hover .media::after{ opacity:1 }
+
+    .tag-neon{ padding:.35rem .7rem; border-radius:9999px; font-weight:700; font-size:.8rem; color:#e5e7eb; border:1px solid var(--stroke); background:rgba(255,255,255,.04); transition:border-color .18s ease, transform .18s ease, background .18s ease }
+    .tag-neon:hover{ border-color:var(--accent); background:rgba(0,255,163,.08); transform:translateY(-2px) }
+
+    /* Skills */
+    .meter{ height:.65rem; width:100%; border-radius:9999px; border:1px solid var(--stroke); background:rgba(255,255,255,.06); overflow:hidden }
+    .meter>span{ display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--accent),#22d3ee); box-shadow:0 6px 18px rgba(0,255,163,.25) inset, 0 0 10px rgba(0,255,163,.35); border-radius:9999px; transition:width 1s ease }
+
+    /* Form */
+    .field{ display:flex; align-items:center; gap:.6rem; padding:1rem; border:1px solid var(--stroke); border-radius:14px; color:#e5e7eb; background:rgba(255,255,255,.04); transition:border-color .2s ease, box-shadow .2s ease, transform .18s ease }
+    .field:focus-within{ border-color:rgba(0,255,163,.45); box-shadow:0 8px 24px rgba(0,255,163,.20); transform:translateY(-1px) }
+    .field input,.field textarea{ width:100%; background:transparent; border:0; outline:0; color:#e5e7eb; font:inherit; resize:vertical }
+    .btn-send-neon{ display:inline-flex; align-items:center; gap:.55rem; padding:.95rem 1.2rem; border-radius:14px; font-weight:800; background:var(--accent); color:#0b1120; box-shadow:0 10px 26px rgba(0,255,163,.30); transition:transform .18s ease, box-shadow .18s ease, filter .18s ease }
+    .btn-send-neon:hover{ transform:translateY(-2px); filter:brightness(1.05); box-shadow:0 16px 36px rgba(0,255,163,.38) }
+
+    /* Footer & Back to top */
+    .footer{ background:#0d0d0d; border-top:1px solid var(--stroke) }
+    .backtop{ position:fixed; right:1rem; bottom:1rem; z-index:40; width:44px; height:44px; display:grid; place-items:center; color:#0b1120; background:var(--accent); border-radius:12px; box-shadow:0 10px 26px rgba(0,255,163,.30); transition:transform .18s ease, box-shadow .18s ease }
+    .backtop:hover{ transform:translateY(-3px); box-shadow:0 16px 36px rgba(0,255,163,.38) }
+
+    /* Accessibility */
+    a,button,[role="button"],input,textarea{ outline:none }
+    a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
+      box-shadow:0 0 0 3px rgba(0,255,163,.35); border-color:var(--accent);
+      border-radius:12px; transition:none;
+    }
+
+    /* Mobile nav panel */
+    .mobile-nav, #nav-menu nav{ background:rgba(2,6,23,.86); border:1px solid var(--stroke); backdrop-filter:blur(10px) }
+
+    /* Reduce Motion */
+    @media (prefers-reduced-motion:reduce){
+      .animate-spin-slow{ animation:none !important }
+      .btn-neon, .icon-btn, .card-neo, .stat-card, .btn-neon-ghost, .btn-send-neon{ transition:none !important }
+    }
+
+    /* =========================
+       THEME OVERRIDE: SOLID DARK (image 2)
+       – dùng khi <body class="theme-solid">
+    ========================== */
+    body.theme-solid, body.theme-solid::before{ background:none !important }
+    body.theme-solid{ background:#0d0d0d !important; color:#e5e7eb }
+    body.theme-solid #bg-net{ display:none !important } /* ẩn particles */
+
+    /* About card outer green glow */
+    .theme-solid .about-glass{
+      box-shadow:
+        0 16px 34px rgba(0,0,0,.45),
+        0 0 0 1px rgba(255,255,255,.02),
+        0 0 40px rgba(0,255,163,.12);
+    }
+    /* Vòng neon: dash biến đổi + quay */
+.ring-spin { transform-origin: 50% 50%; animation: ring-rotate 12s linear infinite; }
+.neon-ring {
+  stroke-dasharray: 24 10 0 0;
+  animation: ring-dash 8s ease-in-out infinite;
+}
+
+/* keyframes giống logic Framer Motion */
+@keyframes ring-dash {
+  0%   { stroke-dasharray: 24 10 0 0; }
+  33%  { stroke-dasharray: 15 120 25 25; }
+  66%  { stroke-dasharray: 16 25 92 72; }
+  100% { stroke-dasharray: 4 250 22 22; }
+}
+@keyframes ring-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Avatar fade-in (tương đương motion.div opacity) */
+.avatar-img.fade-in {
+  opacity: 1;
+  transition: opacity .6s ease-in-out .24s;
+}
+.btn-neon-outline {
+  display:inline-flex; align-items:center; gap:.55rem; padding:.95rem 1.15rem;
+  border-radius:12px; font-weight:800;
+  color:var(--accent); /* chữ neon */
+  background:transparent;
+  border:1px solid var(--accent);
+  text-shadow:0 0 8px rgba(0,255,163,.6); /* glow chữ */
+  box-shadow:0 0 12px rgba(0,255,163,.25); /* glow nhẹ cho outline */
+  transition:transform .18s ease, box-shadow .18s ease, color .18s ease;
+}
+.btn-neon-outline:hover {
+  transform:translateY(-2px);
+  color:#fff; /* hover chữ trắng */
+  text-shadow:0 0 12px rgba(0,255,163,.8);
+  box-shadow:0 0 18px rgba(0,255,163,.45);
+}
+
+  </style>
+</head>
+
+<body class="text-white theme-solid">
+  <!-- Particles background -->
+  <div id="bg-net"></div>
+
+  <!-- Header -->
+  <header class="fixed top-0 w-full z-50 bg-[#0d0d0d]/90 border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="/" class="inline-block">
+  <h1 class="text-4xl font-semibold tracking-tight">
+    Đông
+    <span class="text-[#00ffa3] drop-shadow-[0_0_10px_rgba(0,255,163,0.8)]">.</span>
+  </h1>
+</a>
+
+      <nav class="hidden md:flex gap-6 text-gray-200 font-medium">
+        <a href="#hero" class="transition">Home</a>
+        <a href="#about" class="transition">Resume</a>
+        <a href="#projects" class="transition">Projects</a>
+        <a href="#skills" class="transition">Skills</a>
+        <a href="#contact" class="transition">Contact</a>
+      </nav>
+      <a href="#contact" class="hidden md:inline-flex ml-6 px-4 py-2 rounded-lg font-bold bg-[var(--accent)] text-black hover:scale-105 transition">Hire Me</a>
+      <button id="nav-toggle" class="md:hidden text-white p-3 rounded-lg hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" aria-label="Open Menu" aria-expanded="false" aria-controls="nav-menu">
+        <i class="fa-solid fa-bars text-xl"></i>
+      </button>
+    </div>
+    <!-- Mobile nav panel -->
+<div id="nav-menu" class="md:hidden hidden px-6 pb-4">
+  <nav class="rounded-xl p-3 flex flex-col mobile-nav">
+
+    <!-- Logo on top (mobile nav) -->
+<div class="mb-4 pb-3 border-b border-white/10 flex justify-center">
+  <h1 class="text-4xl font-semibold tracking-tight">
+    Đông
+    <span class="text-[#00ffa3] drop-shadow-[0_0_10px_rgba(0,255,163,0.8)]">.</span>
+  </h1>
+</div>
+<!-- Menu items centered -->
+    <a href="#hero" class="py-3 rounded-lg hover:bg-white/10 text-center">Home</a>
+    <a href="#about" class="py-3 rounded-lg hover:bg-white/10 text-center">About</a>
+    <a href="#projects" class="py-3 rounded-lg hover:bg-white/10 text-center">Projects</a>
+    <a href="#skills" class="py-3 rounded-lg hover:bg-white/10 text-center">Skills</a>
+    <a href="#contact" class="py-3 rounded-lg hover:bg-white/10 text-center">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <<!-- Hero -->
+<section id="hero" class="min-h-screen bg-dark flex flex-col justify-center px-6 pt-28">
+  <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-10 items-center w-full">
+
+    <!-- Avatar FIRST on mobile, SECOND on desktop -->
+    <div class="order-1 md:order-2 flex justify-center" data-aos="zoom-in">
+      <div class="relative w-[298px] h-[298px] xl:w-[498px] xl:h-[498px]">
+        <!-- SVG ring -->
+        <svg class="absolute inset-0 ring-spin" viewBox="0 0 506 506" aria-hidden="true">
+          <defs>
+            <filter id="ringGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="1.6" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <circle class="neon-ring" cx="253" cy="253" r="250" fill="none" stroke="#00ff99"
+                  stroke-width="4" stroke-linecap="round" stroke-linejoin="round"
+                  filter="url(#ringGlow)"/>
+        </svg>
+        <!-- Avatar -->
+        <img src="assets/avatar.jpg" alt="Profile" loading="lazy"
+             class="avatar-img absolute inset-4 w-[calc(100%-2rem)] h-[calc(100%-2rem)]
+                    rounded-full object-cover mix-blend-lighten opacity-0
+                    shadow-[0_0_28px_rgba(0,255,163,.25)]" />
+      </div>
+    </div>
+
+    <!-- Text SECOND on mobile, FIRST on desktop -->
+    <div class="order-2 md:order-1 text-center md:text-left" data-aos="fade-right">
+      <p class="uppercase tracking-widest text-gray-400 text-sm">Software Developer</p>
+      <h1 class="mt-3 font-extrabold leading-tight" style="font-size:clamp(40px,8vw,68px)">
+        <span class="mono text-white">Hello I’m</span><br class="hidden sm:block">
+        <span class="neon">ĐÔNG DEV</span>
+      </h1>
+
+      <!-- typed line -->
+      <div class="mt-2 text-[var(--muted)] text-base sm:text-lg">
+        <span id="typed-text"></span>
+      </div>
+
+      <p class="mt-4 text-gray-300 text-base sm:text-lg max-w-xl md:max-w-none mx-auto md:mx-0">
+        I excel at crafting elegant digital experiences with performance and accessibility in mind.<br>
+        I am proficient across modern programming languages and technologies.
+      </p>
+
+      <a href="assets/cv.pdf" class="btn-neon-outline mt-6">
+  <i class="fa-solid fa-download"></i> Download CV
+</a>
+
+
+      <!-- Social ALWAYS under text -->
+      <div class="mt-6 grid grid-cols-4 gap-4 max-w-xs mx-auto md:mx-0">
+        <a class="icon-btn" href="https://www.facebook.com/dong06.5.98.bg/" aria-label="Facebook"><i class="fab fa-facebook text-xl"></i></a>
+        <a class="icon-btn" href="https://github.com/dong065vn" aria-label="GitHub"><i class="fab fa-github text-xl"></i></a>
+        <a class="icon-btn" href="#" aria-label="YouTube"><i class="fab fa-youtube text-xl"></i></a>
+        <a class="icon-btn" href="#" aria-label="Twitter / X"><i class="fab fa-x-twitter text-xl"></i></a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Stats -->
+  <div class="w-full mt-14" data-aos="fade-up">
+    <div class="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6">
+      <div class="stat-card"><div class="stat-num">12</div><div class="stat-lbl">Years of Experience</div></div>
+      <div class="stat-card"><div class="stat-num">26</div><div class="stat-lbl">Projects Completed</div></div>
+      <div class="stat-card"><div class="stat-num">8</div><div class="stat-lbl">Technologies Mastered</div></div>
+      <div class="stat-card"><div class="stat-num">500</div><div class="stat-lbl">Code Commits</div></div>
+    </div>
+  </div>
+</section>
+
+
+  <!-- About -->
+  <section id="about" class="section-wrap" data-aos="fade-up">
+    <div class="max-w-5xl mx-auto">
+      <div class="card-neo about-glass p-6 sm:p-10">
+        <div class="section-kicker text-center">Profile</div>
+        <h2 class="section-title text-center">About Me</h2>
+        <p class="text-[var(--muted)] leading-relaxed text-center max-w-2xl mx-auto">
+          I’m Đông — a full-stack developer who blends clean UI, strong UX, and performance.
+          I build fast, accessible products and love turning ideas into delightful experiences.
+        </p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-8 max-w-2xl mx-auto">
+          <a href="tel:+84372837802" class="btn-neon-ghost justify-center"><i class="fa-solid fa-phone"></i><span>Phone</span></a>
+          <a href="mailto:daodong204@gmail.com" class="btn-neon-ghost justify-center"><i class="fa-solid fa-envelope"></i><span>Email</span></a>
+          <a href="https://www.facebook.com/dong06.5.98.bg/" target="_blank" class="btn-neon-ghost justify-center"><i class="fa-brands fa-facebook-f"></i><span>Facebook</span></a>
+          <a href="https://zaloapp.com/qr/p/12v5mo2i6udrv" target="_blank" class="btn-neon-ghost justify-center"><i class="fa-regular fa-comments"></i><span>Zalo</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section id="projects" class="section-wrap" data-aos="fade-up">
+    <div class="section-kicker text-center lg:text-left">Work</div>
+    <h2 class="section-title text-center lg:text-left">Projects</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+      <article class="card-neo overflow-hidden" data-aos="fade-up">
+        <div class="media"><img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1200&auto=format&fit=crop" alt="Modern Portfolio"></div>
+        <div class="p-5 grid gap-3">
+          <h3 class="font-extrabold text-white text-lg">Modern Portfolio</h3>
+          <p class="text-[var(--muted)] text-sm">Fast, animated, accessible portfolio with theming.</p>
+          <div class="flex flex-wrap gap-2"><span class="tag-neon">HTML</span><span class="tag-neon">Tailwind</span><span class="tag-neon">AOS</span></div>
+          <div class="flex gap-2 pt-1"><a class="btn-neon-ghost" href="#"><i class="fa-solid fa-arrow-up-right-from-square"></i> Live</a><a class="btn-neon-ghost" href="#"><i class="fa-brands fa-github"></i> GitHub</a></div>
+        </div>
+      </article>
+
+      <article class="card-neo overflow-hidden" data-aos="fade-up" data-aos-delay="75">
+        <div class="media"><img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop" alt="Task Manager App"></div>
+        <div class="p-5 grid gap-3">
+          <h3 class="font-extrabold text-white text-lg">Task Manager App</h3>
+          <p class="text-[var(--muted)] text-sm">Realtime syncing, PWA, offline-ready interactions.</p>
+          <div class="flex flex-wrap gap-2"><span class="tag-neon">React</span><span class="tag-neon">Firebase</span><span class="tag-neon">PWA</span></div>
+          <div class="flex gap-2 pt-1"><a class="btn-neon-ghost" href="#">View</a><a class="btn-neon-ghost" href="#"><i class="fa-brands fa-github"></i> GitHub</a></div>
+        </div>
+      </article>
+
+      <article class="card-neo overflow-hidden" data-aos="fade-up" data-aos-delay="150">
+        <div class="media"><img src="https://images.unsplash.com/photo-1559027615-5dd99741f15f?q=80&w=1200&auto=format&fit=crop" alt="Analytics Dashboard UI"></div>
+        <div class="p-5 grid gap-3">
+          <h3 class="font-extrabold text-white text-lg">Analytics Dashboard UI</h3>
+          <p class="text-[var(--muted)] text-sm">Design-system driven dashboard with micro-interactions.</p>
+          <div class="flex flex-wrap gap-2"><span class="tag-neon">Figma</span><span class="tag-neon">UX</span><span class="tag-neon">Components</span></div>
+          <div class="flex gap-2 pt-1"><a class="btn-neon-ghost" href="#">Case Study</a><a class="btn-neon-ghost" href="#"><i class="fa-brands fa-github"></i> Repo</a></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Skills -->
+  <section id="skills" class="section-wrap" data-aos="fade-up">
+    <div class="section-kicker text-center lg:text-left">Expertise</div>
+    <h2 class="section-title text-center lg:text-left">Skills</h2>
+    <div class="grid lg:grid-cols-2 gap-8 mt-4">
+      <div class="card-neo p-6 sm:p-8" data-aos="fade-right">
+        <h3 class="font-bold text-white mb-3">Core Stack</h3>
+        <div class="flex flex-wrap gap-2">
+          <span class="tag-neon"><i class="fa-brands fa-html5"></i> HTML</span>
+          <span class="tag-neon"><i class="fa-brands fa-css3-alt"></i> CSS/Tailwind</span>
+          <span class="tag-neon"><i class="fa-brands fa-js"></i> JavaScript</span>
+          <span class="tag-neon"><i class="fa-brands fa-react"></i> React</span>
+          <span class="tag-neon"><i class="fa-brands fa-node-js"></i> Node.js</span>
+          <span class="tag-neon"><i class="fa-solid fa-pen-ruler"></i> Figma</span>
+          <span class="tag-neon"><i class="fa-solid fa-universal-access"></i> A11y</span>
+        </div>
+
+        <h3 class="font-bold text-white mt-6 mb-3">Tools</h3>
+        <div class="flex flex-wrap gap-2">
+          <span class="tag-neon"><i class="fa-brands fa-git-alt"></i> Git</span>
+          <span class="tag-neon"><i class="fa-solid fa-box-archive"></i> REST</span>
+          <span class="tag-neon"><i class="fa-solid fa-gauge-high"></i> Perf</span>
+          <span class="tag-neon"><i class="fa-solid fa-vial-circle-check"></i> Testing</span>
+        </div>
+      </div>
+
+      <div class="card-neo p-6 sm:p-8 grid gap-5" data-aos="fade-left">
+        <div><div class="flex items-center justify-between text-sm mb-1 text-[var(--muted)]"><span>HTML/CSS</span><span>92%</span></div><div class="meter"><span data-pct="92"></span></div></div>
+        <div><div class="flex items-center justify-between text-sm mb-1 text-[var(--muted)]"><span>JavaScript</span><span>88%</span></div><div class="meter"><span data-pct="88"></span></div></div>
+        <div><div class="flex items-center justify-between text-sm mb-1 text-[var(--muted)]"><span>React</span><span>84%</span></div><div class="meter"><span data-pct="84"></span></div></div>
+        <div><div class="flex items-center justify-between text-sm mb-1 text-[var(--muted)]"><span>Node.js</span><span>78%</span></div><div class="meter"><span data-pct="78"></span></div></div>
+        <ul class="mt-2 text-sm text-[var(--muted)] space-y-1">
+          <li>Design-to-code (Figma → React/Tailwind)</li>
+          <li>Reusable component systems & theming</li>
+          <li>Accessible UI patterns & keyboard nav</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="section-wrap" data-aos="fade-up">
+    <div class="grid lg:grid-cols-5 gap-8">
+      <div class="lg:col-span-2 card-neo p-6 sm:p-8" data-aos="fade-right">
+        <div class="section-kicker">Contact</div>
+        <h2 class="section-title">Let’s work together</h2>
+        <p class="text-[var(--muted)]">Tell me about your project, timeline, and goals. I respond quickly and can share ideas or a quick prototype.</p>
+        <div class="grid grid-cols-2 gap-3 mt-6">
+          <a class="btn-neon-ghost" href="tel:+84372837802"><i class="fa-solid fa-phone"></i> Call</a>
+          <a class="btn-neon-ghost" href="mailto:daodong204@gmail.com"><i class="fa-solid fa-envelope"></i> Email</a>
+          <a class="btn-neon-ghost" href="https://www.facebook.com/dong06.5.98.bg/" target="_blank"><i class="fa-brands fa-facebook-f"></i> Facebook</a>
+          <a class="btn-neon-ghost" href="https://zaloapp.com/qr/p/12v5mo2i6udrv" target="_blank"><i class="fa-regular fa-comments"></i> Zalo</a>
+        </div>
+      </div>
+
+      <form class="lg:col-span-3 card-neo p-6 sm:p-8 grid gap-4" onsubmit="event.preventDefault(); alert('Thanks! Your message has been sent (demo).');" data-aos="fade-left">
+        <div class="field"><i class="fa-solid fa-user"></i><input type="text" placeholder="Your name" required></div>
+        <div class="field"><i class="fa-solid fa-at"></i><input type="email" placeholder="Your email" required></div>
+        <div class="field"><i class="fa-solid fa-message"></i><textarea rows="5" placeholder="Your message" required></textarea></div>
+        <div class="text-left"><button type="submit" class="btn-send-neon"><i class="fa-solid fa-paper-plane"></i> Send Message</button></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer text-white py-6">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-sm text-[var(--muted)]">© 2025 Đông Dev. All rights reserved.</p>
+      <div class="flex items-center gap-3">
+        <a class="icon-btn" href="https://github.com/dong065vn"><i class="fab fa-github"></i></a>
+        <a class="icon-btn" href=""><i class="fab fa-linkedin-in"></i></a>
+        <a class="icon-btn" href="#"><i class="fab fa-x-twitter"></i></a>
+        <a class="icon-btn" href="#"><i class="fab fa-youtube"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back to top -->
+  <a href="#hero" class="backtop" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></a>
+
+  <!-- Typed.js -->
+  <script>
+    new Typed('#typed-text', {
+      strings:['Fullstack Developer','UI/UX Designer','Creative Coder'],
+      typeSpeed:60, backSpeed:30, loop:true
+    });
+  </script>
+
+  <!-- AOS -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script> AOS.init({ duration: 1000, once: true }); </script>
+
+  <!-- Particles (kept but disabled by theme-solid) -->
+  <script>
+    (function initNet(){
+      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const count = reduce ? 30 : 80;
+      const speed = reduce ? 0.5 : 1.3;
+      if (window.particlesJS) {
+        particlesJS('bg-net', {
+          particles: {
+            number: { value: count, density: { enable: true, value_area: 900 } },
+            color: { value: '#60a5fa' },
+            shape: { type: 'circle' },
+            opacity: { value: 0.45 },
+            size: { value: 2.2, random: true },
+            line_linked: { enable: true, distance: 140, color: '#3b82f6', opacity: 0.35, width: 1 },
+            move: { enable: true, speed: speed, out_mode: 'out' }
+          },
+          interactivity: { detect_on: 'canvas', events: { resize: true } },
+          retina_detect: true
+        });
+      }
+    })();
+  </script>
+
+  <!-- Mobile nav toggle -->
+  <script>
+    (function(){
+      const btn = document.getElementById('nav-toggle');
+      const panel = document.getElementById('nav-menu');
+      if(!btn || !panel) return;
+      btn.addEventListener('click', () => {
+        const open = !panel.classList.toggle('hidden');
+        btn.setAttribute('aria-expanded', String(open));
+        btn.innerHTML = open ? '<i class="fa-solid fa-xmark text-xl"></i>' : '<i class="fa-solid fa-bars text-xl"></i>';
+      });
+      panel.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        if (!panel.classList.contains('hidden')) {
+          panel.classList.add('hidden');
+          btn.setAttribute('aria-expanded', 'false');
+          btn.innerHTML = '<i class="fa-solid fa-bars text-xl"></i>';
+        }
+      }));
+    })();
+  </script>
+
+  <!-- Skills meter fill on scroll -->
+  <script>
+    const fillMeters = () => {
+      document.querySelectorAll('.meter > span').forEach(el => {
+        const pct = el.getAttribute('data-pct');
+        if (el.style.width && el.style.width !== '0%') return;
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight * 0.85) el.style.width = pct + '%';
+      });
+    };
+    window.addEventListener('scroll', fillMeters, { passive:true });
+    window.addEventListener('load', fillMeters);
+  </script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/framer-motion/dist/framer-motion.umd.js"></script>
+<!-- React + ReactDOM + Framer Motion (UMD) -->
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/framer-motion/dist/framer-motion.umd.js"></script>
+
+<!-- Render Avatar Ring bằng Framer Motion -->
+<script>
+  (function(){
+    const { motion } = window.framerMotion;
+    const e = React.createElement;
+
+    function AvatarRingUMD(){
+      return e("div", { className:"relative w-[298px] h-[298px] xl:w-[498px] xl:h-[498px]" },
+
+        // motion.svg quay liên tục + fade-in
+        e(motion.svg, {
+          viewBox:"0 0 100 100", fill:"none", className:"absolute inset-0",
+          initial:{ rotate:0, opacity:0 },
+          animate:{ rotate:360, opacity:1 },
+          transition:{
+            rotate:{ duration:12, ease:"linear", repeat:Infinity },
+            opacity:{ delay:0.2, duration:0.4, ease:"easeIn" }
+          }
+        },
+          // glow nhẹ cho stroke
+          e("defs", null,
+            e("filter", { id:"neonGlow", x:"-50%", y:"-50%", width:"200%", height:"200%" },
+              e("feGaussianBlur", { in:"SourceGraphic", stdDeviation:"1.6", result:"b" }),
+              e("feMerge", null, e("feMergeNode", { in:"b" }), e("feMergeNode", { in:"SourceGraphic" }))
+            )
+          ),
+          // vòng tròn neon + dash loop
+          e(motion.circle, {
+            cx:"253", cy:"253", r:"250",
+            stroke:"#00ff99",
+            strokeWidth:"4",
+            strokeLinecap:"round",
+            strokeLinejoin:"round",
+            fill:"transparent",
+            filter:"url(#neonGlow)",
+            initial:{ strokeDasharray:"24 18 8 8 " , strokeDashoffset:0 },
+            animate:{
+              strokeDasharray:["15 128 25 25","16 25 92 72","4 258 22 22"],
+              rotate:[128,368],
+            },
+            transition:{ duration:28, repeatType:"reverse", repeat:Infinity }
+          })
+        ),
+
+        // avatar fade-in, nằm giữa vòng
+        e(motion.div, {
+          className:"absolute inset-4 rounded-full overflow-hidden shadow-[0_0_28px_rgba(0,255,163,.25)]",
+          initial:{ opacity:0 },
+          animate:{ opacity:1 },
+          transition:{ delay:0.35, duration:0.45, ease:"easeInOut" }
+        },
+          e("img", {
+            src:"assets/avatar.jpg",
+            alt:"Profile",
+            loading:"lazy",
+            className:"w-full h-full object-cover mix-blend-lighten"
+          })
+        )
+      );
+    }
+
+    const mount = document.getElementById("avatar-ring-root");
+    if (mount) {
+      const root = ReactDOM.createRoot(mount);
+      root.render(e(AvatarRingUMD));
+    }
+  })();
+</script>
+<script>
+  // Fade-in avatar khi ảnh sẵn sàng (kể cả khi cache)
+  (function () {
+    const img = document.querySelector('.avatar-img');
+    if (!img) return;
+    const show = () => img.classList.add('fade-in');
+    if (img.complete) show();
+    else img.addEventListener('load', show, { once: true });
+  })();
+</script>
+<script>
+(async function () {
+  try {
+    const r = await fetch('http://localhost:3000/api/sections/projects', { cache:'no-store' });
+    if (!r.ok) return;
+    const j = await r.json();
+    if (j?.ok && typeof j.html === 'string' && j.html.trim()) {
+      const host = document.getElementById('projects');
+      if (!host) return;
+      host.innerHTML = j.html;
+      if (window.AOS && typeof AOS.refreshHard === 'function') {
+        setTimeout(() => AOS.refreshHard(), 50);
+      }
+    }
+  } catch(e) { console.warn('Load projects failed:', e); }
+})();
+</script>
+
+
+</body>
+</html>

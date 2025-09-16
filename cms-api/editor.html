@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Projects Editor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{ --bg:#0b0f1a; --card:#0f172a; --muted:#9fb0c7; --border:#334155; --accent:#00ffa3; --danger:#ef4444; }
+    *{ box-sizing:border-box }
+    body{
+      margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+      font-family: Inter, system-ui, Segoe UI, Arial, sans-serif;
+      background: radial-gradient(1000px 500px at 20% 10%, rgba(0,255,163,.08), transparent 60%),
+                  radial-gradient(900px 520px at 80% 0%, rgba(59,130,246,.10), transparent 60%),
+                  linear-gradient(135deg,#0b0f1a,#1e293b);
+      color:#e5e7eb;
+    }
+    .wrap{
+      width:min(980px, 92vw);
+      background:var(--card); border:1px solid var(--border); border-radius:18px;
+      box-shadow:0 14px 38px rgba(0,0,0,.45);
+      padding:18px;
+      display:grid; gap:18px;
+      grid-template-columns: 1fr 1fr;
+      transform:translateY(0); transition:transform .2s ease, box-shadow .2s ease;
+    }
+    .wrap:hover{ transform:translateY(-3px); box-shadow:0 18px 44px rgba(0,255,163,.22) }
+    h2{ margin:0 0 12px; font-weight:900; letter-spacing:.2px; text-align:center; color:var(--accent); text-shadow:0 0 10px rgba(0,255,163,.35) }
+    .card{ background:#101a2d; border:1px solid var(--border); border-radius:14px; padding:16px }
+    label{ display:block; font-size:.9rem; color:var(--muted); margin:10px 0 6px }
+    input, textarea{
+      width:100%; background:#162338; color:#e5e7eb; border:1px solid var(--border); border-radius:10px;
+      padding:10px; font-size:.95rem; outline:none; transition:border-color .2s, box-shadow .2s;
+    }
+    input:focus, textarea:focus{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(0,255,163,.2) }
+    .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:.55rem;
+      padding:11px 14px; border-radius:12px; font-weight:800; border:1px solid transparent; cursor:pointer;
+      transition:transform .18s, filter .18s, box-shadow .18s, border-color .18s;
+    }
+    .btn:disabled{ opacity:.6; cursor:not-allowed }
+    .btn-primary{ background:var(--accent); color:#0b1120; box-shadow:0 8px 22px rgba(0,255,163,.30) }
+    .btn-primary:hover{ transform:translateY(-2px); filter:brightness(1.05); box-shadow:0 12px 30px rgba(0,255,163,.45) }
+    .btn-ghost{ background:transparent; color:#cfe5ff; border:1px solid rgba(207,229,255,.25) }
+    .btn-ghost:hover{ color:var(--accent); border-color:var(--accent); transform:translateY(-2px); box-shadow:0 10px 22px rgba(0,255,163,.25) }
+    .btn-danger{ background:transparent; color:#fecaca; border:1px solid rgba(239,68,68,.45) }
+    .btn-danger:hover{ color:#fff; border-color:#ef4444; transform:translateY(-2px); box-shadow:0 10px 22px rgba(239,68,68,.28) }
+    .muted{ color:var(--muted); font-size:.9rem }
+    .list{ display:grid; gap:8px; max-height:420px; overflow:auto; padding-right:4px }
+    .item{
+      display:flex; align-items:center; gap:10px; padding:10px; border:1px solid var(--border);
+      border-radius:10px; background:#0f1a2d; transition:border-color .2s, transform .18s;
+    }
+    .item:hover{ border-color:rgba(0,255,163,.35); transform:translateY(-1px) }
+    .title{ font-weight:800; }
+    .actions{ display:flex; gap:8px; flex-wrap:wrap }
+    .pill{ font-size:.75rem; padding:.2rem .5rem; border-radius:999px; border:1px solid rgba(255,255,255,.12); color:#cbd5e1 }
+    .toolbar{ display:flex; gap:8px; align-items:center; justify-content:space-between; margin-top:10px }
+    .sep{ height:1px; background:var(--border); margin:10px 0 }
+    .topbar{ grid-column:1/-1; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; align-items:center }
+    .right{ display:flex; gap:8px; align-items:center }
+    .small{ font-size:.85rem }
+    .apiin{ width:230px }
+    .tokin{ width:200px }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- TopBar -->
+    <div class="topbar">
+      <h2>Projects Editor</h2>
+      <div class="right small">
+        <span class="muted">API</span><input id="api" class="apiin" type="text" value="http://localhost:3000">
+        <span class="muted">Token</span><input id="tok" class="tokin" type="password" value="changeme-please">
+        <button id="btnLoad" class="btn btn-ghost">Load</button>
+        <button id="btnSaveAll" class="btn btn-ghost">Save All (from list)</button>
+      </div>
+    </div>
+<span class="muted">Web B URL</span>
+<input id="webb" class="apiin" type="text" value="http://127.0.0.1:5500/index.html">
+<button id="btnImport" class="btn btn-ghost">Import from Web B</button>
+
+    <!-- LEFT: Add/Update one project -->
+    <div class="card">
+      <div class="muted">Thêm 1 project (append vào danh sách hiện có)</div>
+      <label>Tiêu đề</label><input id="title" placeholder="Ví dụ: Modern Portfolio" />
+      <label>Mô tả</label><textarea id="desc" rows="3" placeholder="Mô tả ngắn..."></textarea>
+      <label>Ảnh (URL hoặc assets/...)</label><input id="img" placeholder="assets/project1.jpg" />
+      <div class="row2">
+        <div>
+          <label>Tags (phân tách bằng dấu phẩy)</label><input id="tags" placeholder="HTML,Tailwind,AOS" />
+        </div>
+        <div>
+          <label>Delay AOS (ms)</label><input id="delay" type="number" min="0" step="25" value="0" />
+        </div>
+      </div>
+      <div class="row2">
+        <div>
+          <label>Live Link</label><input id="live" placeholder="#" />
+        </div>
+        <div>
+          <label>GitHub Link</label><input id="git" placeholder="#" />
+        </div>
+      </div>
+      <button id="btnAdd" class="btn btn-primary" style="margin-top:14px">💾 Add Project</button>
+    </div>
+
+    <!-- RIGHT: Current Projects + Delete -->
+    <div class="card">
+      <div class="muted">Current Projects (chọn để xoá)</div>
+      <div id="projectsList" class="list"></div>
+      <div class="toolbar">
+        <div class="actions">
+          <button id="btnSelectAll" class="btn btn-ghost">Select All</button>
+          <button id="btnClearSel" class="btn btn-ghost">Clear</button>
+        </div>
+        <button id="btnDelete" class="btn btn-danger">🗑️ Delete Selected</button>
+      </div>
+      <div class="sep"></div>
+      <div class="muted small">Tip: Bấm <b>Load</b> để nạp dữ liệu mới nhất từ API. Sau khi xóa, hệ thống sẽ tự <b>Save</b> và làm mới danh sách.</div>
+    </div>
+  </div>
+
+  <script>
+    // ========= Helpers =========
+    const $ = sel => document.querySelector(sel);
+    const apiInput = $('#api'), tokInput = $('#tok');
+    const listEl = $('#projectsList');
+
+    let rawHTML = "";       // string HTML hiện lưu trên API
+    let domRoot = null;     // div chứa rawHTML parse thành DOM (để thao tác)
+    let articleNodes = [];  // NodeList -> Array các <article> hiện tại
+
+    function buildProjectHTML({title, desc, img, tags, live, git, delay}){
+      const tagsHTML = (tags || "")
+        .split(',')
+        .map(t => t.trim())
+        .filter(Boolean)
+        .map(t => `<span class="tag-neon">${t}</span>`)
+        .join('');
+      const delayAttr = Number(delay) > 0 ? ` data-aos-delay="${Number(delay)}"` : '';
+      return `
+<article class="card-neo overflow-hidden" data-aos="fade-up"${delayAttr}>
+  <div class="media"><img src="${img||''}" alt="${title||''}"></div>
+  <div class="p-5 grid gap-3">
+    <h3 class="font-extrabold text-white text-lg">${title||''}</h3>
+    <p class="text-[var(--muted)] text-sm">${desc||''}</p>
+    <div class="flex flex-wrap gap-2">${tagsHTML}</div>
+    <div class="flex gap-2 pt-1">
+      <a class="btn-neon-ghost" href="${live||'#'}">Live</a>
+      <a class="btn-neon-ghost" href="${git||'#'}">GitHub</a>
+    </div>
+  </div>
+</article>`;
+    }
+
+    // Tạo DOM tạm từ rawHTML
+    function parseDOM(html){
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html || "";
+      return tmp;
+    }
+
+    // Lấy danh sách <article> hiện có
+    function getArticles(root){
+  // nếu có section#projects thì tìm trong đó
+  const sec = root.querySelector('#projects');
+  const scope = sec ? sec : root;
+  return Array.from(scope.querySelectorAll('article'));
+}
+
+    // Render danh sách article ra panel phải
+    function renderList(){
+      articleNodes = getArticles(domRoot);
+      if (articleNodes.length === 0){
+        listEl.innerHTML = `<div class="muted">Chưa có project nào.</div>`;
+        return;
+      }
+      listEl.innerHTML = "";
+      articleNodes.forEach((node, idx) => {
+        const title = node.querySelector('h3')?.textContent?.trim() || `Project #${idx+1}`;
+        const delay = node.getAttribute('data-aos-delay') || '0';
+        const li = document.createElement('div');
+        li.className = 'item';
+        li.innerHTML = `
+          <input type="checkbox" data-idx="${idx}">
+          <div style="flex:1">
+            <div class="title">${title}</div>
+            <div class="muted small">Index: ${idx} • AOS delay: ${delay}ms</div>
+          </div>
+          <span class="pill">article</span>
+        `;
+        listEl.appendChild(li);
+      });
+    }
+
+    // Gọi API lấy HTML hiện tại
+    async function loadFromAPI(){
+      const url = apiInput.value.replace(/\/$/,'') + '/api/sections/projects';
+      const r = await fetch(url, { cache:'no-store' });
+      const j = await r.json();
+      rawHTML = (j && j.ok && typeof j.html === 'string') ? j.html : "";
+      domRoot = parseDOM(rawHTML);
+      renderList();
+      alert('Loaded from API!');
+    }
+
+    // Ghi rawHTML mới lên API
+    async function saveToAPI(newHTML){
+      const url = apiInput.value.replace(/\/$/,'') + '/api/sections/projects';
+      const r = await fetch(url, {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'Authorization':'Bearer ' + tokInput.value
+        },
+        body: JSON.stringify({ html:newHTML })
+      });
+      const j = await r.json();
+      if (!j || !j.ok) throw new Error(j?.error || 'save_failed');
+      return j;
+    }
+
+    // ========= Events =========
+    $('#btnLoad').addEventListener('click', loadFromAPI);
+
+    // Add 1 project (append to grid nếu có; nếu không, append cuối raw HTML)
+    $('#btnAdd').addEventListener('click', async ()=>{
+      // lấy dữ liệu từ form
+      const data = {
+        title: $('#title').value.trim(),
+        desc:  $('#desc').value.trim(),
+        img:   $('#img').value.trim(),
+        tags:  $('#tags').value.trim(),
+        live:  $('#live').value.trim(),
+        git:   $('#git').value.trim(),
+        delay: $('#delay').value.trim()
+      };
+      const article = buildProjectHTML(data);
+
+      // đảm bảo đã load
+      if (!domRoot) { domRoot = parseDOM(rawHTML); }
+
+      // ưu tiên chèn vào grid hiện có; nếu không có grid, append vào cuối
+      const grid = domRoot.querySelector('.grid') || domRoot;
+      const holder = document.createElement('div');
+      holder.innerHTML = article;
+      grid.appendChild(holder.firstElementChild);
+
+      const newHTML = domRoot.innerHTML;
+      try{
+        await saveToAPI(newHTML);
+        rawHTML = newHTML;
+        renderList();
+        alert('✅ Added & Saved!');
+      }catch(e){
+        alert('❌ Save error: ' + e);
+      }
+    });
+
+    // Select All / Clear
+    $('#btnSelectAll').addEventListener('click', ()=>{
+      listEl.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+    });
+    $('#btnClearSel').addEventListener('click', ()=>{
+      listEl.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+    });
+
+    // Delete selected articles
+    $('#btnDelete').addEventListener('click', async ()=>{
+      if (!domRoot) { alert('Chưa load dữ liệu. Bấm Load trước.'); return; }
+      const selected = Array.from(listEl.querySelectorAll('input[type="checkbox"]:checked'))
+                            .map(cb => parseInt(cb.dataset.idx,10))
+                            .filter(n => !Number.isNaN(n));
+      if (selected.length === 0){ alert('Chưa chọn project để xoá.'); return; }
+
+      if (!confirm(`Xoá ${selected.length} project đã chọn?`)) return;
+
+      // xoá theo index giảm dần để không lệch index
+      const arts = getArticles(domRoot);
+      selected.sort((a,b)=>b-a).forEach(i => {
+        const node = arts[i];
+        if (node && node.parentNode) node.parentNode.removeChild(node);
+      });
+
+      const newHTML = domRoot.innerHTML;
+      try{
+        await saveToAPI(newHTML);
+        rawHTML = newHTML;
+        renderList();
+        alert('🗑️ Đã xoá & lưu thành công!');
+      }catch(e){
+        alert('❌ Save error: ' + e);
+      }
+    });
+
+    // Save All (nếu anh chỉnh sửa danh sách bằng code khác trong tương lai)
+    $('#btnSaveAll').addEventListener('click', async ()=>{
+      if (!domRoot){ alert('Chưa load dữ liệu.'); return; }
+      try{
+        await saveToAPI(domRoot.innerHTML);
+        alert('✅ Saved current DOM to API!');
+      }catch(e){ alert('❌ Save error: '+e); }
+    });
+
+    // Tự load 1 lần khi mở trang
+    loadFromAPI().catch(()=>{ /* im lặng nếu API chưa chạy */ });
+    async function importFromWebB(){
+  const pageUrlEl = document.querySelector('#webb');
+  if (!pageUrlEl){ alert('Thiếu ô Web B URL (#webb).'); return; }
+  const pageUrl = pageUrlEl.value.trim();
+  if (!pageUrl){ alert('Nhập Web B URL trước (ví dụ: http://127.0.0.1:5500/index.html)'); return; }
+
+  // Chế độ import: "all" = toàn bộ content của #projects; "articles" = chỉ các <article>
+  const mode = "all";
+
+  try{
+    // 1) Tải HTML trang Web B
+    const resp = await fetch(pageUrl, { cache:'no-store' });
+    const htmlText = await resp.text();
+
+    // 2) Parse HTML → tìm section#projects
+    const tmp = document.createElement('div');
+    tmp.innerHTML = htmlText;
+    const sec = tmp.querySelector('#projects');
+    if (!sec){ alert('Không tìm thấy <section id="projects"> trong Web B.'); return; }
+
+    let newHTML = "";
+    if (mode === "all"){
+      // ✅ LẤY TOÀN BỘ NỘI DUNG BÊN TRONG #projects
+      newHTML = sec.innerHTML;
+      if (!newHTML.trim()){
+        alert('Nội dung #projects rỗng.');
+        return;
+      }
+    } else {
+      // (tuỳ chọn) chỉ lấy các <article>
+      const arts = Array.from(sec.querySelectorAll('article'));
+      if (arts.length === 0){
+        alert('Không thấy <article> nào trong #projects của Web B.');
+        return;
+      }
+      newHTML = arts.map(a => a.outerHTML).join('\n');
+    }
+
+    // 3) Lưu lên API
+    await saveToAPI(newHTML);
+
+    // 4) Cập nhật editor view
+    rawHTML = newHTML;
+    domRoot = parseDOM(newHTML);
+    renderList();
+
+    alert('✅ Imported from Web B & saved!');
+  }catch(e){
+    console.error(e);
+    alert('❌ Import error: ' + e);
+  }
+}
+
+// Gán event cho nút (đảm bảo nút có id="btnImport")
+document.querySelector('#btnImport')?.addEventListener('click', importFromWebB);
+
+  </script>
+</body>
+</html>
