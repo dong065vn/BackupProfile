@@ -68,10 +68,9 @@ app.post('/api/sections/projects', (req, res) => {
 // --- ADD: ở đầu file sau các require ---
 const ALLOWED_FETCH_HOSTS = new Set([
   'localhost', '127.0.0.1',
-  'dong065vn.github.io' // 👈 thêm domain Pages của anh
+  'dong065vn.github.io' // ✅ domain Pages của anh
 ]);
 
-// --- ADD: dưới các route /api/sections/... ---
 app.get('/api/proxy/fetch', async (req, res) => {
   try {
     const { url } = req.query;
@@ -83,7 +82,7 @@ app.get('/api/proxy/fetch', async (req, res) => {
     }
 
     const r = await fetch(u.toString(), { redirect: 'follow' });
-    if (!r.ok) return res.status(502).json({ ok:false, error:'upstream_'+r.status });
+    if (!r.ok) return res.status(502).json({ ok:false, error:'upstream_' + r.status });
 
     const html = await r.text();
     res.setHeader('content-type', 'text/html; charset=utf-8');
@@ -93,6 +92,4 @@ app.get('/api/proxy/fetch', async (req, res) => {
     return res.status(500).json({ ok:false, error:'fetch_failed' });
   }
 });
-
-
 app.listen(PORT, () => console.log('API http://localhost:'+PORT));

@@ -306,47 +306,79 @@
 
     // Tự load 1 lần khi mở trang
     loadFromAPI().catch(()=>{ /* im lặng nếu API chưa chạy */ });
-    async function importFromWebB(){
-  const pageUrl = document.querySelector('#webb').value.trim();
+ async function importFromWebB() {
+  const apiBase = document.querySelector('#api')?.value?.replace(/\/$/, '');
+  const pageUrl = document.querySelector('#webb')?.value?.trim();
+  if (!apiBase) { alert('Thiếu API base.'); return; }
   if (!pageUrl) { alert('Nhập Web B URL trước.'); return; }
 
-  const apiBase = document.querySelector('#api').value.replace(/\/$/,''); // ví dụ https://backupprofile.onrender.com
   const proxyUrl = `${apiBase}/api/proxy/fetch?url=${encodeURIComponent(pageUrl)}`;
-
   const mode = "all"; // "all" = lấy toàn bộ content #projects
 
-  try{
-    // 1) Tải HTML trang Web B qua API proxy (tránh CORS)
-    const htmlText = await (await fetch(proxyUrl, { cache:'no-store' })).text();
+  try {
+    console.log('[IMPORT] fetch proxy:', proxyUrl);
+    const resp = await fetch(proxyUrl, { cache: 'no-store' });
+    if (!resp.ok) {
+      const msg = `Proxy failed: ${resp.status} ${resp.statusText}`;
+      console.error(msg);
+      alert('❌ ' + msg + ' – Thường do URL sai, 404 hoặc host chưa whitelist.');
+      return;
+    }
+    const htmlText = await resp.text();
+    if (!htmlText || !htmlText.trim()) {
+      alert('❌ Proxy trả về rỗng. Kiểm URL Pages.');
+      return;
+    }
 
-    // 2) Parse và lấy #projects
+    // Parse & lấy #projects
     const tmp = document.createElement('div');
     tmp.innerHTML = htmlText;
     const sec = tmp.querySelector('#projects');
-    if (!sec){ alert('Không tìm thấy <section id="projects"> trong Web B.'); return; }
+    if (!sec) {
+      console.error('Không tìm thấy #projects trong HTML tải về');
+      alert('❌ Không tìm thấy <section id="projects"> trên trang Web B.');
+      return;
+    }
 
-    let newHTML = (mode === "all")
+    const newHTML = (mode === 'all')
       ? sec.innerHTML
       : Array.from(sec.querySelectorAll('article')).map(a => a.outerHTML).join('\n');
 
-    if (!newHTML.trim()){ alert('Nội dung #projects rỗng.'); return; }
+    if (!newHTML.trim()) {
+      alert('❌ Nội dung #projects rỗng (không có article).');
+      return;
+    }
 
-    // 3) Lưu lên API
-    await saveToAPI(newHTML);
+    // Save
+    const saveUrl = `${apiBase}/api/sections/projects`;
+    console.log('[IMPORT] save to:', saveUrl);
+    const r = await fetch(saveUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + (document.querySelector('#tok')?.value || '')
+      },
+      body: JSON.stringify({ html: newHTML })
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j?.ok) {
+      console.error('Save failed:', r.status, j);
+      alert('❌ Save failed: ' + (j?.error || r.status));
+      return;
+    }
 
-    // 4) Refresh danh sách trong editor
+    // Cập nhật UI
     rawHTML = newHTML;
     domRoot = parseDOM(newHTML);
     renderList();
 
-    alert('✅ Imported from Web B & saved!');
-  }catch(e){
+    alert('✅ Imported & saved!');
+  } catch (e) {
     console.error(e);
     alert('❌ Import error: ' + e);
   }
 }
-
-
+document.querySelector('#btnImport')?.addEventListener('click', importFromWebB);
   </script>
 </body>
 </html>
