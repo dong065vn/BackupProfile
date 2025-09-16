@@ -307,47 +307,34 @@
     // Tự load 1 lần khi mở trang
     loadFromAPI().catch(()=>{ /* im lặng nếu API chưa chạy */ });
     async function importFromWebB(){
-  const pageUrlEl = document.querySelector('#webb');
-  if (!pageUrlEl){ alert('Thiếu ô Web B URL (#webb).'); return; }
-  const pageUrl = pageUrlEl.value.trim();
-  if (!pageUrl){ alert('Nhập Web B URL trước (ví dụ: http://127.0.0.1:5500/index.html)'); return; }
+  const pageUrl = document.querySelector('#webb').value.trim();
+  if (!pageUrl) { alert('Nhập Web B URL trước.'); return; }
 
-  // Chế độ import: "all" = toàn bộ content của #projects; "articles" = chỉ các <article>
-  const mode = "all";
+  const apiBase = document.querySelector('#api').value.replace(/\/$/,''); // ví dụ https://backupprofile.onrender.com
+  const proxyUrl = `${apiBase}/api/proxy/fetch?url=${encodeURIComponent(pageUrl)}`;
+
+  const mode = "all"; // "all" = lấy toàn bộ content #projects
 
   try{
-    // 1) Tải HTML trang Web B
-    const resp = await fetch(pageUrl, { cache:'no-store' });
-    const htmlText = await resp.text();
+    // 1) Tải HTML trang Web B qua API proxy (tránh CORS)
+    const htmlText = await (await fetch(proxyUrl, { cache:'no-store' })).text();
 
-    // 2) Parse HTML → tìm section#projects
+    // 2) Parse và lấy #projects
     const tmp = document.createElement('div');
     tmp.innerHTML = htmlText;
     const sec = tmp.querySelector('#projects');
     if (!sec){ alert('Không tìm thấy <section id="projects"> trong Web B.'); return; }
 
-    let newHTML = "";
-    if (mode === "all"){
-      // ✅ LẤY TOÀN BỘ NỘI DUNG BÊN TRONG #projects
-      newHTML = sec.innerHTML;
-      if (!newHTML.trim()){
-        alert('Nội dung #projects rỗng.');
-        return;
-      }
-    } else {
-      // (tuỳ chọn) chỉ lấy các <article>
-      const arts = Array.from(sec.querySelectorAll('article'));
-      if (arts.length === 0){
-        alert('Không thấy <article> nào trong #projects của Web B.');
-        return;
-      }
-      newHTML = arts.map(a => a.outerHTML).join('\n');
-    }
+    let newHTML = (mode === "all")
+      ? sec.innerHTML
+      : Array.from(sec.querySelectorAll('article')).map(a => a.outerHTML).join('\n');
+
+    if (!newHTML.trim()){ alert('Nội dung #projects rỗng.'); return; }
 
     // 3) Lưu lên API
     await saveToAPI(newHTML);
 
-    // 4) Cập nhật editor view
+    // 4) Refresh danh sách trong editor
     rawHTML = newHTML;
     domRoot = parseDOM(newHTML);
     renderList();
@@ -359,8 +346,6 @@
   }
 }
 
-// Gán event cho nút (đảm bảo nút có id="btnImport")
-document.querySelector('#btnImport')?.addEventListener('click', importFromWebB);
 
   </script>
 </body>
