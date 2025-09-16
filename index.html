@@ -646,7 +646,7 @@
 <script>
 (async function () {
   try {
-    const r = await fetch('http://localhost:3000/api/sections/projects', { cache:'no-store' });
+    const r = await fetch('https://backupprofile.onrender.com/api/sections/projects', { cache:'no-store' });
     if (!r.ok) return;
     const j = await r.json();
     if (j?.ok && typeof j.html === 'string' && j.html.trim()) {
@@ -660,7 +660,6 @@
   } catch(e) { console.warn('Load projects failed:', e); }
 })();
 </script>
-
 
 </body>
 </html>
